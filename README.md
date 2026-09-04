@@ -24,12 +24,12 @@ To understand, from first principles, what actually happens between "kernel load
 ```
 cherryred/
 ├── init/                 # source for the init program (PID 1 / shell)
-│   ├── init.c
+│   ├── init.cpp
 │   └── Makefile
 ├── tools/                # source for hand-written userspace tools
-│   ├── touch.c
-│   ├── rm.c
-│   ├── cat.c
+│   ├── touch.cpp
+│   ├── rm.cpp
+│   ├── cat.cpp
 │   └── Makefile
 ├── kernel/               # kernel CONFIG and patches only — not the kernel source tree
 │   ├── .config
