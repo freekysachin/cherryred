@@ -1,0 +1,6 @@
+build/
+rootfs/*
+!rootfs/etc/
+*.o
+*.cpio.gz
+linux-*.tar.xz
