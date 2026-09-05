@@ -5,4 +5,5 @@ rootfs/*
 *.cpio.gz
 linux-*.tar.xz
 self_task_tracker
+.vscode/
 

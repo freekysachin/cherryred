@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <sys/mount.h>
 #include <unistd.h>
+#include <string.h>
 
 static void emergency_shell(){
   fprintf(stderr, "\nemergency shell...\n");
@@ -15,27 +16,20 @@ static void emergency_shell(){
   }
 }
 
-int main() {
-  // mount the our rootfs directories for initrmfs
-  int procMount = mount("proc", "/proc", "proc", 0, NULL);
-  if (procMount != 0) {
-    fprintf(stderr, "Unable to mount /proc: %s\n", strerror(errno)); // Print the error message to stderr
+static void mount_vfs(char* src, char* dest, char* filetype, short flag){
+  if (mount(src, dest, filetype, flag, NULL) != 0) {
+    fprintf(stderr, "Unable to mount %s: %s\n", src, strerror(errno)); // Print the error message to stderr
 
     // Do not return as this is our PID 1 process and if we return, the kernel will panic and we will not be able to debug the issue
     emergency_shell();
   }
+}
 
-  int sysMount = mount("sysfs", "/sys", "sysfs", 0, NULL);
-  if (sysMount != 0) {
-    fprintf(stderr, "Unable to mount /sys: %s\n", strerror(errno));
-    emergency_shell();
-  }
-
-  int devMount = mount("devtmpfs/", "/dev", "devtmpfs", 0, NULL);
-  if (devMount != 0) {
-    fprintf(stderr, "Unable to mount /dev: %s\n", strerror(errno));
-    emergency_shell();
-  }
+int main() {
+  // mount the our rootfs directories for initrmfs
+  mount_vfs("proc", "/proc", "proc", 0);
+  mount_vfs("sysfs", "/sys", "sysfs", 0);
+  mount("devtmpfs/", "/dev", "devtmpfs", 0);
 
   printf("\n==============\nMount Successful\n==============\n");
 
