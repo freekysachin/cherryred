@@ -4,3 +4,4 @@ rootfs/*
 *.o
 *.cpio.gz
 linux-*.tar.xz
+selt_task_traker
