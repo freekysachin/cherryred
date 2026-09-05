@@ -16,7 +16,7 @@ static void emergency_shell(){
   }
 }
 
-static void mount_vfs(char* src, char* dest, char* filetype, short flag){
+static void mount_vfs(char* src, char* dest, char* filetype, unsigned long flag){
   if (mount(src, dest, filetype, flag, NULL) != 0) {
     fprintf(stderr, "Unable to mount %s: %s\n", src, strerror(errno)); // Print the error message to stderr
 
@@ -29,7 +29,7 @@ int main() {
   // mount the our rootfs directories for initrmfs
   mount_vfs("proc", "/proc", "proc", 0);
   mount_vfs("sysfs", "/sys", "sysfs", 0);
-  mount("devtmpfs/", "/dev", "devtmpfs", 0);
+  mount_vfs("devtmpfs", "/dev", "devtmpfs", 0);
 
   printf("\n==============\nMount Successful\n==============\n");
 
@@ -37,7 +37,8 @@ int main() {
   printf("bin setup Successful\n");
 
   // Command loop
-  while (1) {
+  for(;;){
+    pause();
   }
 
   return 0;
