@@ -4,5 +4,5 @@ rootfs/*
 *.o
 *.cpio.gz
 linux-*.tar.xz
-selt_task_tracker
+self_task_tracker
 
