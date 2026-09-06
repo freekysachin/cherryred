@@ -95,11 +95,20 @@ cherryred/
 
 ## Building & running
 
+Run these in order — each one's output feeds the next:
+
+| # | Script | Does | Rerun when |
+| --- | --- | --- | --- |
+| 1 | `build-kernel.sh` | Fetches Linux from kernel.org, forces on the required config (table above), compiles `build/bzImage`. | kernel version or config changes |
+| 2 | `build-initramfs.sh` | Compiles `earlyinit/init.c` statically, packs it plus the required `/dev/console` node into `build/initramfs.cpio.gz`. | `earlyinit/` changes |
+| 3 | `build-rootfs-img.sh` | Compiles `init/init.c` and `tools/*.c`, formats them into `build/rootfs.img` via `mke2fs -d`. Needs `init/init.c` to exist first — due at `v0.3`. | `init/` or `tools/` changes |
+| 4 | `run-qemu.sh` | Boots whatever's currently in `build/`. Attaches the disk automatically once step 3 has produced one. | every boot |
+
 ```bash
-./scripts/build-kernel.sh       # fetches and builds the Linux kernel
-./scripts/build-initramfs.sh    # builds earlyinit, packages the initramfs cpio
-./scripts/build-rootfs-img.sh   # builds init + tools, formats the disk image
-./scripts/run-qemu.sh           # boots kernel + initramfs + disk in QEMU
+./scripts/build-kernel.sh
+./scripts/build-initramfs.sh
+./scripts/build-rootfs-img.sh   # no-op error until init/init.c exists (v0.3)
+./scripts/run-qemu.sh
 ```
 
 The disk image is built with `mke2fs -d`, which populates a filesystem image directly from a staging directory — so no `sudo`, no `losetup`, and no loop mounts anywhere in the build.
@@ -107,6 +116,14 @@ The disk image is built with `mke2fs -d`, which populates a filesystem image dir
 Binaries are linked with `-static`, because there is no dynamic linker in the rootfs until the final stage of the project.
 
 Scripts are filled in incrementally as each stage is built — see Progress below.
+
+### Quitting QEMU
+
+`run-qemu.sh` boots with `-nographic`, which puts your terminal into raw passthrough: every key you press — **including Ctrl-C** — goes straight to the guest kernel, not to the QEMU process. Since nothing in `earlyinit` reads input or handles that signal, Ctrl-C just disappears into the guest with no visible effect.
+
+To quit: press **Ctrl-A, release it, then press X** (two separate keys, not held together). QEMU reserves Ctrl-A as its own escape prefix for host-side commands — `Ctrl-A H` lists all of them, `Ctrl-A C` opens the QEMU monitor if you need to `quit` from there instead.
+
+If a QEMU process is ever left stuck with no terminal to send that to, `pkill qemu-system-x86_64` from another shell will kill it directly.
 
 ## Progress
 
@@ -125,3 +142,6 @@ Built incrementally, one feature at a time, with each stage tagged in git:
 Hobby project, built for learning rather than stability. Expect things to be broken between stages.
 
 Currently pre-`v0.1`: `earlyinit` has mount logic written, but the build scripts don't exist yet, so nothing has actually booted.
+
+
+## NOTE: Scripts are written by LLM not by any developer, if any issue found report it.
