@@ -32,9 +32,10 @@ int main() {
   mount_vfs("devtmpfs", "/dev", "devtmpfs", 0);
 
   printf("\n==============\nMount Successful\n==============\n");
-
+  
   setenv("PATH", "/bin:/sbin", 1);
   printf("bin setup Successful\n");
+  printf("Hello World\n");
 
   // Command loop
   for(;;){
