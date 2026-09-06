@@ -1,4 +1,5 @@
 build/
+kernel/source
 rootfs/*
 !rootfs/etc/
 *.o
