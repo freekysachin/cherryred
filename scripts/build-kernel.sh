@@ -4,7 +4,11 @@
 # and builds a bzImage into build/.
 #
 # The kernel source is NOT committed to this repo (it's ~1.5GB extracted).
-# Only kernel/.config and kernel/patches/ are ours to version.
+# kernel/.config is deliberately NOT committed either — it's per-developer, so
+# everyone can pick their own options on top of cherryred's actual requirement:
+# REQUIRED_CONFIGS below, which IS versioned (it's code, right here in this
+# script) and gets force-enabled on whatever config you start from, every run.
+# Only kernel/patches/ is shared, versioned content.
 #
 set -euo pipefail
 
@@ -131,4 +135,4 @@ ln -sfn "../build/linux-$KERNEL_VERSION" "$ROOT/kernel/source"
 echo
 echo "built  build/bzImage  ($(du -h "$BUILD/bzImage" | cut -f1))"
 echo "linked kernel/source -> build/linux-$KERNEL_VERSION"
-echo "saved  kernel/.config  — commit this to pin the build"
+echo "saved  kernel/.config  — yours to customize, not committed (see REQUIRED_CONFIGS above)"
