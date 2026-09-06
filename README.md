@@ -145,3 +145,6 @@ Currently pre-`v0.1`: `earlyinit` has mount logic written, but the build scripts
 
 
 ## NOTE: Scripts are written by LLM not by any developer, if any issue found report it.
+
+##### Manual Run:
+qemu-system-x86_64 -kernel build/bzImage -initrd build/initramfs.cpio.gz -m 512M -nographic -no-reboot -enable-kvm -cpu host -append "console=ttyS0"
