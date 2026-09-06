@@ -7,4 +7,4 @@ rootfs/*
 linux-*.tar.xz
 self_task_tracker
 .vscode/
-
+kernel/.config
