@@ -45,10 +45,15 @@ check_deps() {
   done
   [ -f /usr/include/openssl/ssl.h ] || missing+=("libssl-dev")
   [ -f /usr/include/libelf.h ]      || missing+=("libelf-dev")
+  if [ "${MENUCONFIG:-0}" = "1" ]; then
+    [ -f /usr/include/ncurses.h ] || missing+=("libncurses-dev")
+  fi
 
   if [ ${#missing[@]} -gt 0 ]; then
     echo "Missing kernel build dependencies: ${missing[*]}" >&2
-    echo "  sudo apt install build-essential flex bison bc libssl-dev libelf-dev" >&2
+    local hint="build-essential flex bison bc libssl-dev libelf-dev"
+    [ "${MENUCONFIG:-0}" = "1" ] && hint="$hint libncurses-dev"
+    echo "  sudo apt install $hint" >&2
     exit 1
   fi
 }
@@ -87,6 +92,11 @@ if [ -f "$ROOT/kernel/.config" ]; then
 else
   echo ">> no kernel/.config yet, starting from x86_64_defconfig"
   make -C "$KSRC" x86_64_defconfig
+fi
+
+if [ "${MENUCONFIG:-0}" = "1" ]; then
+  echo ">> launching menuconfig — save and exit ('/' to search, then Q) when done"
+  make -C "$KSRC" menuconfig
 fi
 
 echo ">> forcing cherryred's required options on"
