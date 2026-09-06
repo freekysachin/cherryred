@@ -4,7 +4,11 @@
 # and builds a bzImage into build/.
 #
 # The kernel source is NOT committed to this repo (it's ~1.5GB extracted).
-# Only kernel/.config and kernel/patches/ are ours to version.
+# kernel/.config is deliberately NOT committed either — it's per-developer, so
+# everyone can pick their own options on top of cherryred's actual requirement:
+# REQUIRED_CONFIGS below, which IS versioned (it's code, right here in this
+# script) and gets force-enabled on whatever config you start from, every run.
+# Only kernel/patches/ is shared, versioned content.
 #
 set -euo pipefail
 
@@ -45,10 +49,15 @@ check_deps() {
   done
   [ -f /usr/include/openssl/ssl.h ] || missing+=("libssl-dev")
   [ -f /usr/include/libelf.h ]      || missing+=("libelf-dev")
+  if [ "${MENUCONFIG:-0}" = "1" ]; then
+    [ -f /usr/include/ncurses.h ] || missing+=("libncurses-dev")
+  fi
 
   if [ ${#missing[@]} -gt 0 ]; then
     echo "Missing kernel build dependencies: ${missing[*]}" >&2
-    echo "  sudo apt install build-essential flex bison bc libssl-dev libelf-dev" >&2
+    local hint="build-essential flex bison bc libssl-dev libelf-dev"
+    [ "${MENUCONFIG:-0}" = "1" ] && hint="$hint libncurses-dev"
+    echo "  sudo apt install $hint" >&2
     exit 1
   fi
 }
@@ -89,6 +98,11 @@ else
   make -C "$KSRC" x86_64_defconfig
 fi
 
+if [ "${MENUCONFIG:-0}" = "1" ]; then
+  echo ">> launching menuconfig — save and exit ('/' to search, then Q) when done"
+  make -C "$KSRC" menuconfig
+fi
+
 echo ">> forcing cherryred's required options on"
 for opt in "${REQUIRED_CONFIGS[@]}"; do
   "$KSRC/scripts/config" --file "$KSRC/.config" --enable "$opt"
@@ -121,4 +135,4 @@ ln -sfn "../build/linux-$KERNEL_VERSION" "$ROOT/kernel/source"
 echo
 echo "built  build/bzImage  ($(du -h "$BUILD/bzImage" | cut -f1))"
 echo "linked kernel/source -> build/linux-$KERNEL_VERSION"
-echo "saved  kernel/.config  — commit this to pin the build"
+echo "saved  kernel/.config  — yours to customize, not committed (see REQUIRED_CONFIGS above)"

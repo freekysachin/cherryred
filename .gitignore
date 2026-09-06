@@ -7,4 +7,5 @@ rootfs/*
 linux-*.tar.xz
 self_task_tracker
 .vscode/
+# per-developer — see build-kernel.sh REQUIRED_CONFIGS
 kernel/.config

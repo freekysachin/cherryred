@@ -105,7 +105,7 @@ Run these in order — each one's output feeds the next:
 | 4 | `run-qemu.sh` | Boots whatever's currently in `build/`. Attaches the disk automatically once step 3 has produced one. | every boot |
 
 ```bash
-./scripts/build-kernel.sh
+./scripts/build-kernel.sh # run MENUCONFIG=1 ./scripts/build-kernel.sh to open menuconfig
 ./scripts/build-initramfs.sh
 ./scripts/build-rootfs-img.sh   # no-op error until init/init.c exists (v0.3)
 ./scripts/run-qemu.sh
