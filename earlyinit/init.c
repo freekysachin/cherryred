@@ -124,10 +124,12 @@ int main() {
   }
   recursive_remove("/", root_st.st_dev);
 
-  // switch_root's actual mechanism: move the new root's mount onto "/",
-  // chroot into it, then exec the real init. Nothing past this point can
-  // safely return - if exec fails, PID 1 is gone and the kernel panics,
-  // hence emergency_shell rather than propagating the failure upward.
+  /* 
+    switch_root's actual mechanism: move the new root's mount onto "/",
+    chroot into it, then exec the real init. Nothing past this point can
+    safely return - if exec fails, PID 1 is gone and the kernel panics,
+    hence emergency_shell rather than propagating the failure upward.
+  */
   if (chdir("/mnt/root") != 0) {
     fprintf(stderr, "Unable to chdir to /mnt/root: %s\n", strerror(errno));
     emergency_shell();

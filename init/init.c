@@ -5,9 +5,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-// The one thing init knows about its child: where to find it. Swapping the
-// shell for something else later (a GUI launcher, say) is a one-line change
-// here - init itself never needs to know what it's running.
 #define SHELL_PATH "/bin/shell"
 
 static pid_t spawn_shell(void){
@@ -27,9 +24,6 @@ static pid_t spawn_shell(void){
   return pid;
 }
 
-// Keeps retrying (with a backoff so a persistently broken shell doesn't spin
-// the CPU) until a shell is actually running, since init has nothing else to
-// hand the console to.
 static pid_t ensure_shell_running(void){
   pid_t pid = spawn_shell();
   while (pid < 0) {
@@ -51,8 +45,7 @@ int main(void) {
 
     if (died < 0) {
       if (errno == EINTR) continue;
-      // No children at all - shouldn't happen since we always keep a shell
-      // running, but avoid spinning if it ever does.
+      // No children at all - shouldn't happen since we always keep a shell running
       sleep(1);
       continue;
     }
@@ -62,10 +55,6 @@ int main(void) {
       sleep(1); // paces repeated respawns - e.g. while /bin/shell doesn't exist yet
       shell_pid = ensure_shell_running();
     }
-
-    // Any other pid is an orphan reparented to init when its own parent
-    // exited first; wait() above already reaped it - that's the whole of
-    // PID 1's obligation to processes it didn't start itself.
   }
 
   return 0;
